@@ -3,18 +3,17 @@ const cors = require('cors')
 const { Pool } = require('pg')
 
 const app = express()
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 
 app.use(cors())
 app.use(express.json())
 
+require('dotenv').config();
+
 // Подключение к PostgreSQL
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'lake_suggestions',
-  password: 'nigga228',
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 })
 
 // Создание таблицы если её нет
