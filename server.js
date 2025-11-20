@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express')
 const cors = require('cors')
 const { Pool } = require('pg')
@@ -8,13 +10,19 @@ const PORT = 3001
 app.use(cors())
 app.use(express.json())
 
-// Подключение к PostgreSQL
+// Подключение к PostgreSQL - закоментил на всякий случай для бэкапа
+//const pool = new Pool({
+//  user: 'postgres',
+//  host: 'localhost',
+//  database: 'lake_suggestions',
+//  password: 'nigga228',
+//  port: 5432,
+//})
+
+// Подключение к PostgreSQL - ЗАМЕНИТЬ НА:
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'lake_suggestions',
-  password: 'nigga228',
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 })
 
 // Создание таблицы если её нет
@@ -27,7 +35,9 @@ const initTable = async () => {
         message TEXT NOT NULL,
         status VARCHAR(20) DEFAULT 'new',
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        likes INTEGER DEFAULT 0
+        likes INTEGER DEFAULT 0,
+        is_pinned BOOLEAN DEFAULT FALSE,
+        priority INTEGER DEFAULT 0
       )
     `)
     console.log('✅ Table "suggestions" created/verified')
